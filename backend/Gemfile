@@ -70,3 +70,7 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
+
+gem 'rack-cors', '~> 1.1'
+gem 'graphiql-rails', github: 'rmosolgo/graphiql-rails', group: :development
+gem 'graphql', '~> 2.0'
