@@ -1,13 +1,11 @@
-import React from 'react'
+import App from '@/app'
 import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
-import actionCable from 'actioncable'
+import { initialize } from "@/app/initialize";
+import { RouterProvider } from "react-router-dom";
 
-const CableApp: { cable: any } = { cable: null}
+import '@/ui/style/index.css'
 
-CableApp.cable = actionCable.createConsumer('ws://localhost:3000/cable')
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <App cable={CableApp.cable} />
+  <RouterProvider router={initialize(<App />)} />,
 )
