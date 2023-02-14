@@ -1,9 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
 
-function App() {
+interface FCProps {
+  cable: any
+}
+
+const App: React.FC<FCProps> = ({ cable }) => {
   const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    cable.subscriptions.create(
+      {
+        channel: 'PipeChannel',
+      },
+      {
+        connected: () => {
+          console.log("Connected to pipe channel!")
+        },
+        received: (message: any) => {
+          console.log("MESSAGE:", message)
+        },
+      },
+    )
+  }, [])
 
   return (
     <div className="App">
