@@ -1,21 +1,14 @@
-# Flash Aldo :)
+# Flash Aldo
 
 ## Heads up
 
-- Backend folder: Don't forget installing all dependencies for Rails (bundle install)
--- rails db:setup
--- rails db:migrate
--- rails db:seed
-- Frontend folder: Also don't forget installing all dependencies for the frontend (yarn install)
--- yarn install
-- Broadcaster folder: 
--- websocketd --port=8080 ruby inventory.rb
+1. Frontend folder: yarn install (vite app)
 
-### Make sure to start the processess in this respective order: [the order matters :)]
+### Make sure to start the processes in this respective order: the order matters :)
 
-1. Broadcaster
-2. Rails
-3. React (vite)
+1. Broadcaster (websocketd --port=8080 ruby inventory.rb)
+2. Rails (rails s)
+3. React (yarn dev)
 
 ### Original concept
 
