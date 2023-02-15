@@ -1,6 +1,5 @@
 import actionCable from 'actioncable'
 import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
-import { onError } from "@apollo/client/link/error";
 import { cachePolicy } from "@/app/graphql/queries/policies";
 
 type GraphQL = {
@@ -10,15 +9,6 @@ type GraphQL = {
 export const graphql: GraphQL = {
   client: undefined,
 };
-
-// Log any GraphQL errors or network error that occurred
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({ message, locations, path }) =>
-      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
-    );
-  if (networkError) console.log(`[Network error]: ${networkError}`);
-});
 
 function createApolloClient(uri: string, credentials?: string) {
   let httpLink = new HttpLink({

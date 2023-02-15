@@ -1,3 +1,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.flicker-blue {
+  animation: flick-blue 1s forwards  ;
+}
+
+@keyframes flick-blue {
+  0%{
+    background-color: rgb(249 250 251);
+  }
+  50%{
+    background-color: rgb(147 197 253);
+  }
+  100%{
+    background-color: rgb(249 250 251);
+  }
+}
+
+.flicker-green {
+  animation: flick-green 1s forwards  ;
+}
+
+@keyframes flick-green {
+  0%{
+    background-color: rgb(249 250 251);
+  }
+  50%{
+    background-color: rgb(134 239 172);
+  }
+  100%{
+    background-color: rgb(249 250 251);
+  }
+}
+
+.flicker-yellow {
+  animation: flick-yellow 1s forwards  ;
+}
+
+@keyframes flick-yellow {
+  0%{
+    background-color: rgb(249 250 251);
+  }
+  50%{
+    background-color: rgb(253 224 71);
+  }
+  100%{
+    background-color: rgb(249 250 251);
+  }
+}
+
+.flicker-red {
+  animation: flick-red 1s forwards  ;
+}
+
+@keyframes flick-red {
+  0%{
+    background-color: rgb(249 250 251);
+  }
+  50%{
+    background-color: rgb(252 165 165);
+  }
+  100%{
+    background-color: rgb(249 250 251);
+  }
+}

@@ -17,5 +17,5 @@ loop do
       inventory: INVENTORY.sample,
     }, quirks_mode: true)
   end
-  sleep 2
+  sleep 0.5
 end

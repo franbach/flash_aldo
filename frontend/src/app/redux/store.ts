@@ -1,10 +1,9 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
-
 import { dashboardReducer } from "@/pages/dashboard/redux/reducer";
 
 export const store = configureStore({
   reducer: {
-    post_reducer: dashboardReducer,
+    app: dashboardReducer,
   },
 });
 
