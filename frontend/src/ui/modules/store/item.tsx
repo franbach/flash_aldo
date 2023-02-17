@@ -1,19 +1,24 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { GiConverseShoe } from "react-icons/gi"
 import { useAppSelector } from "@/app/redux/hooks"
 import { IShoe } from "@/pages/dashboard/redux/reducer"
 import { get_store } from "@/pages/dashboard/redux/selectors"
 import { useNavigation } from "react-router-dom"
+import { RxDragHandleDots2 } from "react-icons/rx"
+import { useDrag, useDrop } from "react-dnd"
+import TransferModal from "@/ui/modules/modal"
 
 const StoreItem: React.FC<Omit<IShoe & { store: string }, "id">> = ({ store, name, inventory }) => {
 
-  const [css, setCSS] = useState('')
+  const ref = useRef(null)
   const navigation = useNavigation();
-
-  const item = useAppSelector(state => get_store(state, [store, name]))
+  const shoe = useAppSelector(state => get_store(state, [store, name]))
+  
+  const [css, setCSS] = useState('')
+  const [data, setData] = useState({});
+  const [showModal, setShowModal] = useState(false)
 
   const handleColorInventory = (amount: number) => {
-
     let color = "bg-blue-300 text-blue-600"
 
     switch(true) {
@@ -36,13 +41,13 @@ const StoreItem: React.FC<Omit<IShoe & { store: string }, "id">> = ({ store, nam
   }
 
   useEffect(() => {
-    if (navigation.state === "idle" && item.name === name) {
+    if (navigation.state === "idle" && shoe.name === name) {
 
-      let color = item.inventory >= 75
+      let color = shoe.inventory >= 75
         ? 'flicker-green'
-        : item.inventory >= 50 && item.inventory < 75
+        : shoe.inventory >= 50 && shoe.inventory < 75
         ? 'flicker-blue'
-        : item.inventory >= 25 && item.inventory < 50
+        : shoe.inventory >= 25 && shoe.inventory < 50
         ? 'flicker-yellow'
         : 'flicker-red'
 
@@ -52,25 +57,51 @@ const StoreItem: React.FC<Omit<IShoe & { store: string }, "id">> = ({ store, nam
         setCSS('')
       }, 1000)
     }
-  }, [navigation, item])
+  }, [navigation, shoe])
+
+  const [ { isDragging }, dragRef ] = useDrag({
+    type: "SHOE",
+    item: { store: store, shoe: name, inventory: shoe.inventory },
+    collect: monitor => ({
+      isDragging: monitor.isDragging()
+    })
+  })
+
+  const [ { isOver }, dropRef ] = useDrop({
+    accept: "SHOE",
+    collect: monitor => ({
+      isOver: monitor.isOver()
+    }),
+    drop: (item: any) => {
+      if (item.store !== store && item.shoe === shoe.name) {
+        setData({ from: item.store, to: store, shoe: shoe.name, amount: item.inventory })
+        setShowModal(true);
+      }
+    }
+  })
+
+  dragRef(dropRef(ref))
 
   return (
-    <div className={`${css} flex justify-between items-center bg-gray-50 rounded p-3 divide-x-2 transition-all duration-200`}>
-      <div className="flex divide-x-2 space-x-2">
-        <GiConverseShoe />
-        <p className="text-sm font-medium text-gray-500 pl-2">{name}</p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-sm font-medium text-gray-500 pl-2">Inventory:</p>
-        <div className={`flex text-sm font-medium min-w-[30px] ${handleColorInventory(item.inventory)} justify-center rounded`}>
-          <p>{item.inventory}</p>
+    <>
+      <div ref={ref} className={`${css} ${isDragging || isOver ? "ring-1 ring-gray-400" : ""} flex justify-between items-center bg-gray-50 rounded p-3 divide-x-2 transition-all duration-200`}>
+        <div className="flex divide-x-2 space-x-2">
+          <GiConverseShoe />
+          <p className="text-sm font-medium text-gray-500 pl-2">{name}</p>
         </div>
-        <button className="text-sm bg-gray-300 px-2 rounded text-gray-600 ml-2 hover:bg-black hover:text-white transition-all duration-300">
-          <p>send to</p>
-        </button>
-        <div className="flex bg-red-300 "></div>
+        <div className="flex items-center space-x-2">
+          <p className="text-sm font-medium text-gray-500 pl-2">Inventory:</p>
+          <div className={`flex text-sm font-medium min-w-[30px] ${handleColorInventory(shoe.inventory)} justify-center rounded`}>
+            <p>{shoe.inventory}</p>
+          </div>
+          <button className="text-sm bg-gray-300 p-1 rounded text-gray-600 ml-2 hover:bg-black hover:text-white transition-all duration-300">
+            <RxDragHandleDots2 />
+          </button>
+          <div className="flex bg-red-300 "></div>
+        </div>
       </div>
-    </div>
+      <TransferModal data={data} open={showModal} trigger={setShowModal} />
+    </>
   )
 }
 

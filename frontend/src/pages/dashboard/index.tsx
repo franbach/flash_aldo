@@ -46,6 +46,7 @@ const Dashboard: React.FC = () => {
           console.log("Connected to pipe channel!")
         },
         received: async (message: any) => {
+          // console.log(message)
           await dispatcher(app_update_entry, message)
         },
       },

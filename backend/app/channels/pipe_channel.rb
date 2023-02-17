@@ -34,7 +34,4 @@ class PipeChannel < ApplicationCable::Channel
     stop_all_streams
   end
 
-  # def received(data)
-  # end
-
 end
