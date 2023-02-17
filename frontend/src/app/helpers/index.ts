@@ -1,4 +1,4 @@
-import actionCable from 'actioncable'
+import actionCable from "actioncable";
 import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { cachePolicy } from "@/app/graphql/queries/policies";
 
@@ -33,14 +33,16 @@ export function initializeApollo(uri: string, credentials?: string) {
   return _apolloClient;
 }
 
-/** 
- * ActionCable connection 
+/**
+ * ActionCable connection
  */
-export const action: { cable: ReturnType<typeof actionCable.createConsumer> | null } = { cable: null }
+export const action: {
+  cable: ReturnType<typeof actionCable.createConsumer> | null;
+} = { cable: null };
 
 export function initializeActionCable(host: string) {
-  const _actionCable = action.cable ?? actionCable.createConsumer(host)
-  if (!action.cable) action.cable = _actionCable
+  const _actionCable = action.cable ?? actionCable.createConsumer(host);
+  if (!action.cable) action.cable = _actionCable;
 
   return _actionCable;
 }

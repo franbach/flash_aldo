@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Formik, Form, Field } from "formik";
 import { Dialog, Transition } from "@headlessui/react";
 import { HiOutlineArrowTopRightOnSquare } from "react-icons/hi2";
@@ -61,8 +61,8 @@ const TransferModal: React.FC<FCProps> = ({ open, trigger, data }) => {
                         amount: values.amount,
                       },
                     });
-                    setSubmitting(false)
-                    trigger(false)
+                    setSubmitting(false);
+                    trigger(false);
                   }}
                 >
                   {({ errors, isSubmitting }) => (

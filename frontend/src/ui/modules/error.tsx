@@ -6,7 +6,7 @@ const Error: React.FC = () => {
       <p className="">2. Start the Rails server</p>
       <p className="">3. Start the frontend</p>
     </div>
-  )
-}
+  );
+};
 
 export default Error;

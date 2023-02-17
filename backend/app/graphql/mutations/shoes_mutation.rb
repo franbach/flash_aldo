@@ -1,6 +1,6 @@
 module Mutations
   class ShoesMutation < BaseMutation
-    field :transfer_shoe_mutation, type: Types::ShoeType, null: false do
+    field :transfered, type: Types::ShoeType, null: false do
       description "Transfer inventory from one store to another"
     end
 
@@ -28,12 +28,12 @@ module Mutations
 
       if @to.update({ inventory: @to.inventory + amount })
         return {
-          shoe: @to,
+          transfered: @to,
           errors: []
         } 
       else
         return {
-          shoe: nil,
+          transfer: nil,
           errors: [@to.errors.full_messages, @from.errors.full_messages]
         }
       end

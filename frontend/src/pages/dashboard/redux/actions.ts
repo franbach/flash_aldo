@@ -1,31 +1,35 @@
-import { graphql } from "@/app/helpers"
-import { TRANSFER_SHOES } from "@/app/graphql/mutatuions"
-import { dispatcher } from "@/app/redux/helper"
+import { graphql } from "@/app/helpers";
+import { dispatcher } from "@/app/redux/helper";
+import { TRANSFER_SHOES } from "@/app/graphql/mutatuions";
+import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 
-import { createAction, createAsyncThunk } from "@reduxjs/toolkit"
-
-export const app_set_stores = createAction('app/set_stores')
-
-export const app_update_entry = createAction('app/update_entry')
-
-export const app_hide_warnings = createAction('app/hide_warnings')
+export const app_set_stores = createAction("app/set_stores");
+export const app_update_entry = createAction("app/update_entry");
+export const app_hide_warnings = createAction("app/hide_warnings");
 
 export const app_transfer_shoe = createAsyncThunk("app_transfer_shoe", async (payload: any, { rejectWithValue }) => {
+  /**
+   * Update the entries in the database
+   */
+  const response = await graphql.client.mutate({
+    mutation: TRANSFER_SHOES,
+    variables: { input: payload.transfer },
+  });
 
-  await dispatcher(app_update_entry, payload)
+  const { data, error } = response;
 
-  // const response = await graphql.client.query({
-  //   query: TRANSFER_SHOES,
-  //   variables: { id: payload },
-  // });
+  if (error) {
+    throw rejectWithValue(error);
+  }
 
-  // const { data, loading, error } = response;
+  try {
+    /**
+     * Update the entries in the state
+     */
+    await dispatcher(app_update_entry, payload);
+  } catch (e) {
+    throw rejectWithValue(e);
+  }
 
-  // if (error) {
-  //   throw rejectWithValue(error);
-  // }
-
-  // return { data, loading };
-
-  return payload;
+  return { data };
 });

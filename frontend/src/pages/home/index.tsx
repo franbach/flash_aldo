@@ -1,7 +1,5 @@
 const Home: React.FC = () => {
-  return (
-    <p>Home</p>
-  )
-}
+  return <p>Home</p>;
+};
 
-export default Home
+export default Home;

@@ -1,6 +1,6 @@
 import { useNavigation } from "react-router-dom";
-import IconThunder from "@/assets/thunder-icon.svg"
-import IconAldoStore from "@/assets/aldo-icon.svg"
+import IconThunder from "@/assets/thunder-icon.svg";
+import IconAldoStore from "@/assets/aldo-icon.svg";
 import MoonLoader from "react-spinners/MoonLoader";
 
 import LinkTo from "@/ui/buttons/LinkTo";
@@ -19,7 +19,7 @@ const Header: React.FC = () => {
         <LinkTo path="/dashboard" title="Dashboard" />
       </div>
       <div className="flex">
-        <MoonLoader 
+        <MoonLoader
           color={"#000"}
           loading={navigation.state === "loading"}
           size={24}

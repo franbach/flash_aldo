@@ -10,16 +10,15 @@ import { initializeApollo, initializeActionCable } from "@/app/helpers";
 import { getStoresData } from "@/pages/dashboard";
 
 export const initialize = (root: ReactNode) => {
-
   initializeApollo("http://localhost:3000/graphql", "same-origin");
-  initializeActionCable('ws://localhost:3000/cable')
+  initializeActionCable("ws://localhost:3000/cable");
 
   return createBrowserRouter(
     createRoutesFromElements(
       <Route element={root /** React App and Layout*/}>
-        <Route path="/" index element={<Home /> } />
-        <Route path="/dashboard" element={<Dashboard />} loader={getStoresData} errorElement={<Error /> } />
-      </Route>
+        <Route path="/" index element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} loader={getStoresData} errorElement={<Error />} />
+      </Route>,
     ),
   );
 };

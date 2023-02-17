@@ -1,4 +1,3 @@
-
 import { store } from "@/app/redux/store";
 import { Provider } from "react-redux";
 import { Layout } from "@/ui/layout/app";
@@ -21,4 +20,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App
+export default App;

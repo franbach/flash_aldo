@@ -1,9 +1,12 @@
 import { gql } from "@apollo/client";
 
 export const TRANSFER_SHOES = gql`
-  mutation ShoeMutation($input: ShoesMutationInput!) {
-    transferShoeMutation(input: $input) {
-      clientMutationId
+  mutation ShoesMutation($input: ShoesMutationInput!) {
+    transfer(input: $input) {
+      transfered {
+        name
+        inventory
+      }
     }
   }
 `;

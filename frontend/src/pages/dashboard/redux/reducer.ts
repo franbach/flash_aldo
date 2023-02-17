@@ -1,101 +1,114 @@
+import { toast } from "react-toastify";
 import { createReducer, current } from "@reduxjs/toolkit";
-import { toast } from 'react-toastify';
 import { app_set_stores, app_update_entry, app_hide_warnings } from "@/pages/dashboard/redux/actions";
 
-export interface IShoe {
+export type IShoe = {
   id: string;
   name: string;
-  inventory: number
-}
+  inventory: number;
+};
 
 export interface IStore {
   id: string;
   name: string;
-  shoes: Array<IShoe>
+  shoes: {
+    [key: string]: IShoe;
+  };
 }
 
-export interface IStores {
-  stores: {
-    [key: string]: IStore
-  }
-}
+export type IStores = {
+  [key: string]: IStore;
+};
 
 interface InitialState {
-  stores: {},
+  stores: IStores;
   ui: {
-    hidewarnings: boolean
-  }
+    hidewarnings: boolean;
+  };
 }
 
 export const initialState: InitialState = {
   stores: {},
   ui: {
-    hidewarnings: false
-  }
-}
+    hidewarnings: false,
+  },
+};
 
 export const dashboardReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(app_set_stores, (state, { payload }: any) => {
-
-      let hash: { [key: string]: { id: string, name: string, shoes: { [key: string]: any } } } = {}
+      let hash: {
+        [key: string]: {
+          id: string;
+          name: string;
+          shoes: { [key: string]: any };
+        };
+      } = {};
 
       payload.forEach((store: any) => {
         hash[store.name] = {
           id: store.id,
           name: store.name,
-          shoes: {}
-        }
+          shoes: {},
+        };
 
         store.shoes.forEach((shoe: any) => {
           hash[store.name].shoes[shoe.name] = {
             id: shoe.id,
             name: shoe.name,
-            inventory: shoe.inventory
-          }
-        })
-      })
+            inventory: shoe.inventory,
+          };
+        });
+      });
 
-      state.stores = hash
+      state.stores = hash;
     })
     .addCase(app_update_entry, (state, { payload }: any) => {
+      let store_name: string;
+      let store_shoe: string;
+      let shoe_amount: number;
+      let transfer_to: string;
 
+      /**
+       * Logic for adding and removing the shoes in question
+       */
       if (payload.transfer) {
-        //@ts-ignore
-        state.stores[payload.transfer.from].shoes[payload.transfer.shoe].inventory =
-          //@ts-ignore
-          state.stores[payload.transfer.from].shoes[payload.transfer.shoe].inventory - payload.transfer.amount
+        store_name = payload.transfer.from;
+        store_shoe = payload.transfer.shoe;
+        transfer_to = payload.transfer.to;
+        shoe_amount = payload.transfer.amount;
 
-        //@ts-ignore
-        state.stores[payload.transfer.to].shoes[payload.transfer.shoe].inventory =
-          //@ts-ignore
-          state.stores[payload.transfer.to].shoes[payload.transfer.shoe].inventory + payload.transfer.amount
+        /**
+         * Removes shoes from the store that is sending
+         */
+        state.stores[store_name].shoes[store_shoe].inventory =
+          state.stores[store_name].shoes[store_shoe].inventory - shoe_amount;
 
-        toast.success(`${payload.transfer.from} just sent ${payload.transfer.amount} pairs of shoes to ${payload.transfer.to}`, {
-          theme: "light"
-        })
+        /**
+         * Adds the shoes that is receiving with the existing inventory amount
+         */
+        state.stores[transfer_to].shoes[store_shoe].inventory =
+          state.stores[transfer_to].shoes[store_shoe].inventory + shoe_amount;
 
+        toast.success(`${store_name} just sent ${payload.transfer.amount} pairs of shoes to ${transfer_to}`, {
+          theme: "light",
+        });
       } else {
-        let store_name: string = payload.store
-        let shoes_name: string = payload.name
-  
-        // @ts-ignore
-        state.stores[store_name].shoes[shoes_name].inventory = payload.inventory
-  
-        // if (payload.inventory < 25 && !state.ui.hidewarnings) {
-        //   toast.warn(`${store_name} running low on ${shoes_name} shoes`, {
-        //     theme: "light"
-        //   })
-        // }
-      }
+        /**
+         * Logic to update existing inentory entry
+         */
+        store_name = payload.store;
+        store_shoe = payload.name;
 
+        state.stores[store_name].shoes[store_shoe].inventory = payload.inventory;
+      }
     })
     .addCase(app_hide_warnings, (state) => {
       if (state.ui.hidewarnings) {
-        state.ui.hidewarnings = false
-        toast.dismiss()
+        state.ui.hidewarnings = false;
+        toast.dismiss();
       } else {
-        state.ui.hidewarnings = true
+        state.ui.hidewarnings = true;
       }
-    })
+    });
 });

@@ -1,10 +1,10 @@
-import App from '@/app'
-import ReactDOM from 'react-dom/client'
+import App from "@/app";
+import ReactDOM from "react-dom/client";
 import { initialize } from "@/app/initialize";
 import { RouterProvider } from "react-router-dom";
 
-import '@/ui/style/index.css'
+import "@/ui/style/index.css";
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <RouterProvider router={initialize(<App />)} />,
-)
+);
