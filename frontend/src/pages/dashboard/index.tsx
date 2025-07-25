@@ -1,8 +1,7 @@
 import { useEffect } from "react";
-import { action } from "@/app/helpers";
-import { graphql } from "@/app/helpers";
+import { getActionCableConsumer, getApolloClient } from "@/app/helpers";
 import { useQuery } from "@apollo/client";
-import { dispatcher } from "@/app/redux/helper";
+import { store } from "@/app/redux/store";
 import { app_set_stores, app_update_entry } from "@/pages/dashboard/redux/actions";
 import { QUERY_ALL_STORES } from "@/app/graphql/queries";
 import Store from "@/ui/modules/store";
@@ -16,7 +15,7 @@ export const getStoresData = async () => {
   let response;
 
   try {
-    response = await graphql.client.query({
+    response = await getApolloClient().query({
       query: QUERY_ALL_STORES,
       variables: {},
     });
@@ -24,15 +23,24 @@ export const getStoresData = async () => {
     console.log("Something went wrong while querying the database", e);
   }
 
-  await dispatcher(app_set_stores, response.data.stores);
+  const stores = response?.data?.stores ?? [];
+  store.dispatch(app_set_stores(stores));
   return response;
 };
 
 const Dashboard: React.FC = () => {
   const all = useQuery(QUERY_ALL_STORES);
+  const stores = all.data?.stores ?? [];
 
   useEffect(() => {
-    action.cable?.subscriptions.create(
+    let consumer: ReturnType<typeof getActionCableConsumer> | undefined;
+    try {
+      consumer = getActionCableConsumer();
+    } catch {
+      return;
+    }
+
+    consumer.subscriptions.create(
       {
         channel: "PipeChannel",
       },
@@ -41,13 +49,13 @@ const Dashboard: React.FC = () => {
           console.log("Connected to pipe channel!");
         },
         received: async (message: any) => {
-          await dispatcher(app_update_entry, message);
+          store.dispatch(app_update_entry(message));
         },
       },
     );
 
     return () => {
-      action.cable?.disconnect();
+      consumer?.disconnect();
     };
   }, []);
 
@@ -61,7 +69,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-        {all.data.stores.map((store: any) => {
+        {stores.map((store: any) => {
           return <Store key={store.name} name={store.name} shoes={store.shoes} />;
         })}
       </div>

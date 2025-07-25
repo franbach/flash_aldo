@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { createReducer, current } from "@reduxjs/toolkit";
+import { createReducer, type PayloadAction } from "@reduxjs/toolkit";
 import { app_set_stores, app_update_entry, app_hide_warnings } from "@/pages/dashboard/redux/actions";
+import type { StoreDto, UpdateEntryPayload } from "@/pages/dashboard/redux/types";
 
 export type IShoe = {
   id: string;
@@ -36,23 +36,23 @@ export const initialState: InitialState = {
 
 export const dashboardReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(app_set_stores, (state, { payload }: any) => {
+    .addCase(app_set_stores, (state, { payload }: PayloadAction<StoreDto[]>) => {
       let hash: {
         [key: string]: {
           id: string;
           name: string;
-          shoes: { [key: string]: any };
+          shoes: { [key: string]: IShoe };
         };
       } = {};
 
-      payload.forEach((store: any) => {
+      payload.forEach((store) => {
         hash[store.name] = {
           id: store.id,
           name: store.name,
           shoes: {},
         };
 
-        store.shoes.forEach((shoe: any) => {
+        store.shoes.forEach((shoe) => {
           hash[store.name].shoes[shoe.name] = {
             id: shoe.id,
             name: shoe.name,
@@ -63,50 +63,46 @@ export const dashboardReducer = createReducer(initialState, (builder) => {
 
       state.stores = hash;
     })
-    .addCase(app_update_entry, (state, { payload }: any) => {
-      let store_name: string;
-      let store_shoe: string;
-      let shoe_amount: number;
-      let transfer_to: string;
-
+    .addCase(app_update_entry, (state, { payload }: PayloadAction<UpdateEntryPayload>) => {
       /**
        * Logic for adding and removing the shoes in question
        */
-      if (payload.transfer) {
-        store_name = payload.transfer.from;
-        store_shoe = payload.transfer.shoe;
-        transfer_to = payload.transfer.to;
-        shoe_amount = payload.transfer.amount;
+      if ("transfer" in payload) {
+        const fromStoreName = payload.transfer.from;
+        const shoeName = payload.transfer.shoe;
+        const toStoreName = payload.transfer.to;
+        const amount = payload.transfer.amount;
+
+        const fromStore = state.stores[fromStoreName];
+        const toStore = state.stores[toStoreName];
+
+        const fromShoe = fromStore.shoes[shoeName];
+        const toShoe = toStore.shoes[shoeName];
 
         /**
          * Removes shoes from the store that is sending
          */
-        state.stores[store_name].shoes[store_shoe].inventory =
-          state.stores[store_name].shoes[store_shoe].inventory - shoe_amount;
+        fromShoe.inventory = fromShoe.inventory - amount;
 
         /**
          * Adds the shoes that is receiving with the existing inventory amount
          */
-        state.stores[transfer_to].shoes[store_shoe].inventory =
-          state.stores[transfer_to].shoes[store_shoe].inventory + shoe_amount;
-
-        toast.success(`${store_name} just sent ${payload.transfer.amount} pairs of shoes to ${transfer_to}`, {
-          theme: "light",
-        });
+        toShoe.inventory = toShoe.inventory + amount;
       } else {
         /**
          * Logic to update existing inentory entry
          */
-        store_name = payload.store;
-        store_shoe = payload.name;
+        const storeName = payload.store;
+        const shoeName = payload.name;
 
-        state.stores[store_name].shoes[store_shoe].inventory = payload.inventory;
+        const store = state.stores[storeName];
+        const shoe = store.shoes[shoeName];
+        shoe.inventory = payload.inventory;
       }
     })
     .addCase(app_hide_warnings, (state) => {
       if (state.ui.hidewarnings) {
         state.ui.hidewarnings = false;
-        toast.dismiss();
       } else {
         state.ui.hidewarnings = true;
       }

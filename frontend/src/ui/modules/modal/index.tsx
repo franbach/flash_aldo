@@ -4,7 +4,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { HiOutlineArrowTopRightOnSquare } from "react-icons/hi2";
 import MoonLoader from "react-spinners/MoonLoader";
 import * as Yup from "yup";
-import { dispatcher } from "@/app/redux/helper";
+import { useAppDispatch } from "@/app/redux/hooks";
 import { app_transfer_shoe } from "@/pages/dashboard/redux/actions";
 
 interface FCProps {
@@ -14,6 +14,8 @@ interface FCProps {
 }
 
 const TransferModal: React.FC<FCProps> = ({ open, trigger, data }) => {
+  const dispatch = useAppDispatch();
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={() => trigger(false)}>
@@ -53,14 +55,16 @@ const TransferModal: React.FC<FCProps> = ({ open, trigger, data }) => {
                   })}
                   onSubmit={async (values, { setSubmitting }) => {
                     setSubmitting(true);
-                    await dispatcher(app_transfer_shoe, {
-                      transfer: {
-                        from: data.from,
-                        to: data.to,
-                        shoe: data.shoe,
-                        amount: values.amount,
-                      },
-                    });
+                    await dispatch(
+                      app_transfer_shoe({
+                        transfer: {
+                          from: data.from,
+                          to: data.to,
+                          shoe: data.shoe,
+                          amount: values.amount,
+                        },
+                      }),
+                    );
                     setSubmitting(false);
                     trigger(false);
                   }}
@@ -129,50 +133,3 @@ const TransferModal: React.FC<FCProps> = ({ open, trigger, data }) => {
 };
 
 export default TransferModal;
-
-{
-  /* <Formik
-      enableReinitialize
-      initialValues={{
-        id: id,
-        title: title,
-        body: body,
-      }}
-      validationSchema={Yup.object({
-        title: Yup.string().min(5, "Please, no less than 5 characters").required("Required"),
-        body: Yup.string().max(50, "Must be 50 characters or less").required("Required"),
-      })}
-      onSubmit={async (values, { setSubmitting }) => {
-        let response = await dispatcher(api_gql_update_post, { post: values });
-      }}
-    >
-      {({ errors, touched }) => (
-        <Form className="flex-1">
-          <div className="flex flex-col m-2 p-2 rounded border border-slate-200">
-            <div className="flex flex-col items-start space-y-2">
-              <Field
-                placeholder="Title"
-                name="title"
-                type="text"
-                className="w-full p-2 text-xl ring-1 ring-gray-200 rounded bg-gray-100"
-              />
-              {errors.title && <p className="text-red-400">{errors.title}</p>}
-              <Field
-                placeholder="Message"
-                name="body"
-                as="textarea"
-                rows="10"
-                className="w-full items-start p-2 text-xl ring-1 ring-gray-200 rounded bg-slate-100"
-              />
-              {errors.body && <p className="text-red-400">{errors.body}</p>}
-              <div className="flex space-x-2">
-                <button type="submit" className="bg-green-400 text-white rounded p-2">
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        </Form>
-      )}
-    </Formik> */
-}

@@ -6,12 +6,13 @@ import Dashboard from "@/pages/dashboard";
 import Error from "@/ui/modules/error";
 
 import { initializeApollo, initializeActionCable } from "@/app/helpers";
+import { appConfig } from "@/app/config";
 
 import { getStoresData } from "@/pages/dashboard";
 
 export const initialize = (root: ReactNode) => {
-  initializeApollo("http://localhost:3000/graphql", "same-origin");
-  initializeActionCable("ws://localhost:3000/cable");
+  initializeApollo(appConfig.graphqlUrl, appConfig.graphqlCredentials);
+  initializeActionCable(appConfig.cableUrl);
 
   return createBrowserRouter(
     createRoutesFromElements(

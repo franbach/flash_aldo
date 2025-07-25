@@ -1,16 +1,10 @@
 import actionCable from "actioncable";
-import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
+import { ApolloClient, InMemoryCache, HttpLink, type NormalizedCacheObject } from "@apollo/client";
 import { cachePolicy } from "@/app/graphql/queries/policies";
 
-type GraphQL = {
-  client: any;
-};
+let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
-export const graphql: GraphQL = {
-  client: undefined,
-};
-
-function createApolloClient(uri: string, credentials?: string) {
+function createApolloClient(uri: string, credentials?: RequestCredentials) {
   let httpLink = new HttpLink({
     uri,
     credentials,
@@ -26,23 +20,31 @@ function createApolloClient(uri: string, credentials?: string) {
   });
 }
 
-export function initializeApollo(uri: string, credentials?: string) {
-  const _apolloClient = graphql.client ?? createApolloClient(uri, credentials);
-  if (!graphql.client) graphql.client = _apolloClient;
+export function initializeApollo(uri: string, credentials?: RequestCredentials) {
+  apolloClient = apolloClient ?? createApolloClient(uri, credentials);
+  return apolloClient;
+}
 
-  return _apolloClient;
+export function getApolloClient() {
+  if (!apolloClient) {
+    throw new Error("Apollo client is not initialized");
+  }
+  return apolloClient;
 }
 
 /**
  * ActionCable connection
  */
-export const action: {
-  cable: ReturnType<typeof actionCable.createConsumer> | null;
-} = { cable: null };
+let actionCableConsumer: ReturnType<typeof actionCable.createConsumer> | null = null;
 
 export function initializeActionCable(host: string) {
-  const _actionCable = action.cable ?? actionCable.createConsumer(host);
-  if (!action.cable) action.cable = _actionCable;
+  actionCableConsumer = actionCableConsumer ?? actionCable.createConsumer(host);
+  return actionCableConsumer;
+}
 
-  return _actionCable;
+export function getActionCableConsumer() {
+  if (!actionCableConsumer) {
+    throw new Error("ActionCable consumer is not initialized");
+  }
+  return actionCableConsumer;
 }

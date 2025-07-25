@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "pretty": "prettier --write '**/*.{css,js,ts,tsx,json}'"
+    "pretty": "prettier --write '**/*.{css,js,ts,tsx,json}'",
+    "format": "npm run pretty"
   },
   "dependencies": {
     "@apollo/client": "^3.7.7",
