@@ -1,5 +1,7 @@
 # Flash Aldo
 
+![Demo](demo.gif)
+
 ## Instructions
 
 1. brew install websocketd
