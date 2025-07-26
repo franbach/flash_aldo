@@ -1,6 +1,6 @@
 module Mutations
   class ShoesMutation < BaseMutation
-    field :transfered, type: Types::ShoeType, null: false do
+    field :transfered, type: Types::ShoeType, null: true do
       description "Transfer inventory from one store to another"
     end
 
@@ -21,20 +21,17 @@ module Mutations
     end
 
     def resolve(from:, to:, amount:, shoe:)
-      @from = Shoe.where(name: shoe).joins(:store).where(store: { name: from })[0]
-      @from.update({ inventory: @from.inventory - amount })
+      result = Shoes::Transfer.call(from: from, to: to, amount: amount, shoe: shoe)
 
-      @to = Shoe.where(name: shoe).joins(:store).where(store: { name: to })[0]
-
-      if @to.update({ inventory: @to.inventory + amount })
-        return {
-          transfered: @to,
+      if result.shoe
+        {
+          transfered: result.shoe,
           errors: []
-        } 
+        }
       else
-        return {
-          transfer: nil,
-          errors: [@to.errors.full_messages, @from.errors.full_messages]
+        {
+          transfered: nil,
+          errors: result.errors
         }
       end
     end
